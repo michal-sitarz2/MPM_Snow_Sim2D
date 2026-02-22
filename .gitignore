@@ -1,6 +1,10 @@
 build/
 distrib/
 
+.git/
+.vs/
+.vscode/
+
 # Prerequisites
 *.d
 
