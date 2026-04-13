@@ -8,10 +8,13 @@ The following commands can be used to build the soluation, and generate the exec
 ``` bash
 mkdir build
 cd build
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
-cmake --build . --target MPM_solver --config Release
+cmake .. -G "Visual Studio 17 2022" -A x64
+cmake --build . --target MPM --config Release
 ```
 
 ### Simulation
-All of the simulation parameters are located in `src/Parameters.h`. The frames of the simulation will be rendered into the `render/` folder.
+All of the simulation parameters (including GPU and CPU simulation) are located in `src/Parameters.h`.
+The frames of the simulation will be rendered into the `render/` folder.
+
+
 

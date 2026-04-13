@@ -14,7 +14,7 @@ Cell::Cell(glm::vec2 inLoc) : loc(inLoc)
 // Inspired by: https://github.com/Elias-Gu/MPM2D, for separators
 void Cell::DetectCollisions(std::vector<BorderLine>& border)
 {
-    /* Collisions */
+    /* Border Collisions */
     vel_collision = vel;
 
     std::vector<BorderLine> collisions;
@@ -36,7 +36,7 @@ void Cell::DetectCollisions(std::vector<BorderLine>& border)
             // Velocity correction in the direction of the normal
             vel_collision -= (delta_dist * line.normal) / DELTA_TIME;
 
-            // Save collisions for 
+            // Save collisions 
             collisions.push_back(line);
         }
     }
@@ -73,7 +73,7 @@ Grid::Grid(int inWidth, int inHeight, int inBoundMargin)
     , height(inHeight)
     , margin(inBoundMargin)
 {
-    std::cout << "[DEBUG] Setting up the grid" << std::endl;
+    std::cout << "Setting up the grid" << std::endl;
     
     /* Defining the grid of cells */
     for (int y = 0; y <= height; y++)

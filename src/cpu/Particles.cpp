@@ -107,7 +107,7 @@ void Particle::UpdateDeformationGrad(glm::mat2 gradVel)
 
 Particles::Particles(Grid& inGrid) : grid(inGrid)
 {
-    std::cout << "[DEBUG] Setting up the particle shapes" << std::endl;
+    std::cout << "Setting up the particle shapes" << std::endl;
     for (SHAPE* shape : SHAPES)
         Init(*shape);
 }
@@ -154,12 +154,6 @@ void Particles::InterpolateVelocities()
                 // Distance between particle and cell
                 glm::vec2 g_i = glm::vec2(i, j);
                 glm::vec2 dist = pPos - g_i;
-
-                // TODO: Debugging
-
-                auto vel1 = cell.GetVelocity();
-                auto vel2 = cell.GetVelocityCollision();
-                auto vel3 = cell.GetVelocityFriction();
 
                 // Weight
                 float weight = Grid::ComputeWeight(dist);

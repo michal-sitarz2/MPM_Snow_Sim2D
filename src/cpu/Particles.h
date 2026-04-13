@@ -3,7 +3,6 @@
 #include "Grid.h"
 #include "Parameters.h"
 
-
 class Particle
 {
 public:
@@ -27,6 +26,7 @@ public:
 
     /* Getters */
     float GetMass() const             { return mass; }
+    float GetVol() const              { return volInit; }
     glm::vec2 GetPosition() const     { return pos; }
     glm::vec2 GetVelocity() const     { return vel; }
     glm::mat2 GetElasticForce() const { return F_Elastic; }

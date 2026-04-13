@@ -3,6 +3,8 @@
 #include <vector>
 #include "Shapes.h"
 
+#define USE_GPU true
+
 /*
 Experimental Parameter values inspired by:
 	-> https://github.com/Azmisov/snow
@@ -28,6 +30,7 @@ static std::vector<SHAPE*> SHAPES = {
 };
 
 /* Simulation */
+static const int MAX_FRAMES = 200;
 
 static const float
 	GRAVITY = -9.81f,  // Gravity Force
@@ -44,10 +47,10 @@ static const float
 
 /* Snow Parameters */
 static const float 
-	PARTICLE_SIZE = 1.f,  // TODO:?
+	PARTICLE_SIZE = 1.f,  // Particle Size
 	THETA_C = 2.0e-2,     // Critical Compression
 	THETA_S = 6.0e-3,     // Critical Stretch
-	XI = 10,              // Hardening Coefficient
+	XI = 10.f,            // Hardening Coefficient
 	NU = 2.0e-1,		  // Poisson Ratio
 	E = 1.4e5,            // Youngs Modulus
 	RHO = 400.f;	      // Typical densities of snow 100 - 400 kg/m^3

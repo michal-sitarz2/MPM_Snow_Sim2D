@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-glm::mat2 VectorOuterProduct(glm::vec2 v, glm::vec2 d)
+inline glm::mat2 VectorOuterProduct(glm::vec2 v, glm::vec2 d)
 {
 	return glm::mat2(
 		v.x * d.x,   // col0, row0
@@ -17,7 +17,7 @@ glm::mat2 VectorOuterProduct(glm::vec2 v, glm::vec2 d)
 	);
 }
 
-Eigen::Matrix2f GLMToEigen(glm::mat2 A)
+inline Eigen::Matrix2f GLMToEigen(glm::mat2 A)
 {
 	Eigen::Matrix2f result;
 	result(0, 0) = A[0][0]; result(0, 1) = A[1][0];  // row 0
@@ -25,7 +25,7 @@ Eigen::Matrix2f GLMToEigen(glm::mat2 A)
 	return result;
 }
 
-glm::mat2 EigenToGLM(Eigen::Matrix2f A)
+inline glm::mat2 EigenToGLM(Eigen::Matrix2f A)
 {
 	return glm::mat2(
 		A(0, 0), A(1, 0),   // col 0
