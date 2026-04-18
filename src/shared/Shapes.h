@@ -12,8 +12,136 @@ enum SHAPE_TYPE
 	SNOWBALL
 };
 
-// Bridson's algorithm (2007) -> near-maximal Poisson disk distribution
-inline std::vector<glm::vec2> PoissonDiskCircle(
+
+#ifdef SIM_3D
+inline std::vector<glm::vec3> PoissonDiskSphere(
+    glm::vec3 center,
+    float     sphereRadius,
+    float     minDist,
+    int       maxAttempts = 30)
+{
+    std::mt19937 gen(std::random_device{}());
+    auto randF = [&](float lo, float hi) {
+        return std::uniform_real_distribution<float>(lo, hi)(gen);
+    };
+
+    const float cellSize = minDist / std::sqrt(3.0f);
+    const int   gridW = (int)std::ceil(2.0f * sphereRadius / cellSize) + 2;
+    const int   gridH = gridW;
+    const int   gridD = gridW;
+
+    std::vector<int>       bgGrid(gridW * gridH * gridD, -1);
+    std::vector<glm::vec3> samples;
+    std::vector<glm::vec3> active;
+
+    glm::vec3 origin = center - glm::vec3(sphereRadius);
+
+    auto toCell = [&](glm::vec3 p) -> std::tuple<int, int, int> {
+        return {
+            (int)((p.x - origin.x) / cellSize),
+            (int)((p.y - origin.y) / cellSize),
+            (int)((p.z - origin.z) / cellSize)
+        };
+    };
+
+    auto addSample = [&](glm::vec3 p) {
+        auto [gx, gy, gz] = toCell(p);
+        bgGrid[gz * gridW * gridH + gy * gridW + gx] = (int)samples.size();
+        samples.push_back(p);
+        active.push_back(p);
+    };
+
+    // Seed with a random point inside the sphere
+    {
+        float theta = randF(0.0f, 2.0f * PI);
+        float phi = std::acos(randF(-1.0f, 1.0f));
+        float r = std::cbrt(randF(0.0f, sphereRadius * sphereRadius * sphereRadius));
+        addSample(center + glm::vec3(
+            r * std::sin(phi) * std::cos(theta),
+            r * std::sin(phi) * std::sin(theta),
+            r * std::cos(phi)
+        ));
+    }
+
+    while (!active.empty())
+    {
+        std::uniform_int_distribution<int> dist(0, (int)active.size() - 1);
+        int ai = dist(gen);
+        glm::vec3 point = active[ai];
+        bool found = false;
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            // Random direction on sphere
+            float theta = randF(0.0f, 2.0f * PI);
+            float phi = std::acos(randF(-1.0f, 1.0f));
+            float r1 = randF(0.0f, 1.0f);
+            float d = minDist * (r1 + 1.0f);
+            glm::vec3 candidate = point + glm::vec3(
+                d * std::sin(phi) * std::cos(theta),
+                d * std::sin(phi) * std::sin(theta),
+                d * std::cos(phi)
+            );
+
+            if (glm::length(candidate - center) > sphereRadius) continue;
+
+            auto [cgx, cgy, cgz] = toCell(candidate);
+            if (cgx < 0 || cgy < 0 || cgz < 0 ||
+                cgx >= gridW || cgy >= gridH || cgz >= gridD) continue;
+
+            bool tooClose = false;
+            for (int dx = -2; dx <= 2 && !tooClose; dx++)
+                for (int dy = -2; dy <= 2 && !tooClose; dy++)
+                    for (int dz = -2; dz <= 2 && !tooClose; dz++)
+                    {
+                        int nx = cgx + dx, ny = cgy + dy, nz = cgz + dz;
+                        if (nx < 0 || ny < 0 || nz < 0 ||
+                            nx >= gridW || ny >= gridH || nz >= gridD) continue;
+                        int ni = bgGrid[nz * gridW * gridH + ny * gridW + nx];
+                        if (ni >= 0 && glm::length(samples[ni] - candidate) < minDist)
+                            tooClose = true;
+                    }
+
+            if (!tooClose)
+            {
+                addSample(candidate);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            active.erase(active.begin() + ai);
+    }
+
+    return samples;
+}
+
+struct SHAPE_3D
+{
+    glm::vec3 loc;
+    glm::vec3 vel;
+
+    SHAPE_3D(glm::vec3 loc, glm::vec3 vel) : loc(loc), vel(vel) {}
+    virtual ~SHAPE_3D() = default;
+    virtual void GenerateSamples(float minDist) = 0;
+};
+
+struct SNOWBALL_SHAPE_3D : public SHAPE_3D
+{
+    float radius;
+    std::vector<glm::vec3> sphereSamples;
+
+    SNOWBALL_SHAPE_3D(glm::vec3 loc, glm::vec3 vel, float radius)
+        : SHAPE_3D(loc, vel), radius(radius) {}
+
+    void GenerateSamples(float minDist) override
+    {
+        sphereSamples = PoissonDiskSphere(loc, radius, minDist);
+    }
+};
+#else
+inline std::vector<glm::vec2> PoissonDiskCircle( // Bridson's algorithm (2007) -> near-maximal Poisson disk distribution
     glm::vec2 center,
     float     circleRadius,
     float     minDist,
@@ -189,3 +317,4 @@ struct SNOWBALL_SHAPE : public SHAPE
         }
 	}
 };
+#endif

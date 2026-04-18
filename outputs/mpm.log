@@ -3,21 +3,21 @@
 [INFO] Vendor: NVIDIA Corporation
 [INFO] Renderer: NVIDIA GeForce RTX 3060 Laptop GPU/PCIe/SSE2
 [INFO] ================================================================
-[INFO] Initializing Simulation (GPU)
+[INFO] Initializing 3D Simulation (GPU)
 [INFO] GPU Solver Initialization
-[INFO] Particle Count: 11868
+[INFO] Particle Count: 15509
 [INFO] Particle Buffer allocation
 [INFO] No errors at InitBuffers Particles
-[INFO] Number of grid cells: 20301
+[INFO] Number of grid cells: 2050401
 [INFO] Grid Buffer allocation
 [INFO] No errors at InitBuffers Grid
-[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/p2g.glsl
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/3d/p2g.glsl
 [INFO] Shader Program Linked
-[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/grid_update.glsl
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/3d/grid_update.glsl
 [INFO] Shader Program Linked
-[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/g2p.glsl
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/3d/g2p.glsl
 [INFO] Shader Program Linked
-[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/reset.glsl
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/3d/reset.glsl
 [INFO] Shader Program Linked
 [INFO] Frame: 1
 [INFO] Frame: 2

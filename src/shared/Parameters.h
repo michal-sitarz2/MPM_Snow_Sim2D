@@ -5,6 +5,21 @@
 
 #define USE_GPU true
 
+#ifdef SIM_3D
+    using Vec = glm::vec3;
+    using Mat = glm::mat3;
+	using VecGPU = glm::vec4; // padding for std430
+	using MatGPU = glm::mat4; // padding for std430
+    static constexpr int DIM = 3;
+#else
+    using Vec = glm::vec2;
+    using Mat = glm::mat2;
+	using VecGPU = glm::vec2;
+    using MatGPU = glm::mat2;
+    static constexpr int DIM = 2;
+#endif
+
+
 /*
 Experimental Parameter values inspired by:
 	-> https://github.com/Azmisov/snow
@@ -13,21 +28,29 @@ Experimental Parameter values inspired by:
 
 /* Grid */
 static const int
-	WIDTH = 200,		// window width
-	HEIGHT = 100,		// window height
+	WIDTH = 200,		// grid width
+	HEIGHT = 100,		// grid height
 	BORDER_MARGIN = 2;  // border margin on the edges
+	
+#ifdef SIM_3D
+static const int DEPTH = 100;  // grid depth 
+#endif
 
 /* Shape Generation */
 static const int NUM_PARTICLES = 3000;
 
-static std::vector<SHAPE*> SHAPES = {
-	/* Snowball Drop: */
-	// new SNOWBALL_SHAPE(glm::vec2(100,50), glm::vec2(0, 0), 15),
-
-	/* Snowball Crush: */
-	new SNOWBALL_SHAPE(glm::vec2(50,45), glm::vec2(40, 0), 15),
-	new SNOWBALL_SHAPE(glm::vec2(150,55), glm::vec2(-40, 0), 15),
+/* Snowballs Crushing */
+#ifdef SIM_3D
+static std::vector<SHAPE_3D*> SHAPES = {
+    new SNOWBALL_SHAPE_3D(glm::vec3(50, 45, 50), glm::vec3(40, 0, 0), 15),
+    new SNOWBALL_SHAPE_3D(glm::vec3(150, 55, 50), glm::vec3(-40, 0, 0), 15),
 };
+#else
+static std::vector<SHAPE*> SHAPES = {
+    new SNOWBALL_SHAPE(glm::vec2(50, 45), glm::vec2(40, 0), 15),
+    new SNOWBALL_SHAPE(glm::vec2(150, 55), glm::vec2(-40, 0), 15),
+};
+#endif
 
 /* Simulation */
 static const int MAX_FRAMES = 200;

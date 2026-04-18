@@ -4,14 +4,15 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "CPUSolver.h"
-
 GPUSolver::GPUSolver()
 {
     Log::Info("GPU Solver Initialization");
 
     gWidth = WIDTH;
     gHeight = HEIGHT;
+    #ifdef SIM_3D
+        gDepth = DEPTH;
+    #endif
 
     /* Initialize SSBOs */
     InitBuffers();
@@ -93,13 +94,44 @@ void GPUSolver::InitBuffers()
     
     /* Particles */
     std::vector<float> mass, vol;
-    std::vector<glm::vec2> pos, vel;
-    std::vector<glm::mat2> Fe, Fp, Ap, Bp;
+    std::vector<VecGPU> pos, vel;
+    std::vector<MatGPU> Fe, Fp, Ap, Bp;
 
-    for (SHAPE* shape : SHAPES) /* shapes defined in shared/Parameters.h */
+#ifdef SIM_3D
+    for (SHAPE_3D* shape : SHAPES)
+    {
+        auto* snowball = dynamic_cast<SNOWBALL_SHAPE_3D*>(shape);
+        if (!snowball)
+        {
+            std::string msg = "Unsupported shape type";
+            Log::Error(msg);
+            throw std::runtime_error(msg);
+        }
+
+        const float radius = snowball->radius;
+        float minDist = radius / std::cbrt((float)NUM_PARTICLES);
+        snowball->GenerateSamples(minDist);
+
+        for (auto& p : snowball->sphereSamples)
+        {
+            float v = (4.f / 3.f) * PI * radius * radius * radius
+                    / (float)snowball->sphereSamples.size();
+            float m = (v * RHO) / 100.f;
+
+            pos.push_back(glm::vec4(p, 0.0f));
+            vel.push_back(glm::vec4(snowball->vel, 0.0f));
+            vol.push_back(v);
+            mass.push_back(m);
+            Fe.push_back(MatGPU(1.f));
+            Fp.push_back(MatGPU(1.f));
+            Bp.push_back(MatGPU(0.f));
+        }
+    }
+#else
+    for (SHAPE* shape : SHAPES)
     {
         auto* snowball = dynamic_cast<SNOWBALL_SHAPE*>(shape);
-        if (!snowball) 
+        if (!snowball)
         {
             std::string msg = "Unsupported shape type";
             Log::Error(msg);
@@ -112,59 +144,71 @@ void GPUSolver::InitBuffers()
 
         for (auto& p : snowball->diskSamples)
         {
-            float v = 2.f * PI * radius * radius / (float) snowball->diskSamples.size();
-            float m = ((v * RHO) / 100.f); 
+            float v = 2.f * PI * radius * radius / (float)snowball->diskSamples.size();
+            float m = (v * RHO) / 100.f;
 
             pos.push_back(p);
             vel.push_back(snowball->vel);
             vol.push_back(v);
             mass.push_back(m);
-            Fe.push_back(glm::mat2(1.f));
-            Fp.push_back(glm::mat2(1.f));
-            Ap.push_back(glm::mat2(0.f));
-            Bp.push_back(glm::mat2(0.f));
+            Fe.push_back(MatGPU(1.f));
+            Fp.push_back(MatGPU(1.f));
+            Bp.push_back(MatGPU(0.f));
         }
     }
+#endif
 
     numParticles = (int)pos.size();
     Log::Info("Particle Count: " + std::to_string(numParticles));
 
     /* Particle Buffers */
     Log::Info("Particle Buffer allocation");
-    allocateSSBO(ssbo_pos,  0, pos.data(),  numParticles * sizeof(glm::vec2));
-    allocateSSBO(ssbo_vel,  1, vel.data(),  numParticles * sizeof(glm::vec2));
+    allocateSSBO(ssbo_pos,  0, pos.data(),  numParticles * sizeof(VecGPU));
+    allocateSSBO(ssbo_vel,  1, vel.data(),  numParticles * sizeof(VecGPU));
     allocateSSBO(ssbo_mass, 2, mass.data(), numParticles * sizeof(float));
     allocateSSBO(ssbo_vol,  3, vol.data(),  numParticles * sizeof(float));
-    allocateSSBO(ssbo_Fe,   4, Fe.data(),   numParticles * sizeof(glm::mat2));
-    allocateSSBO(ssbo_Fp,   5, Fp.data(),   numParticles * sizeof(glm::mat2));
-    allocateSSBO(ssbo_Bp,   6, Bp.data(),   numParticles * sizeof(glm::mat2));
+    allocateSSBO(ssbo_Fe,   4, Fe.data(),   numParticles * sizeof(MatGPU));
+    allocateSSBO(ssbo_Fp,   5, Fp.data(),   numParticles * sizeof(MatGPU));
+    allocateSSBO(ssbo_Bp,   6, Bp.data(),   numParticles * sizeof(MatGPU));
     CheckGLError("InitBuffers Particles");
 
     /* Grid */
+    #ifdef SIM_3D
+    int gSize = (gWidth + 1) * (gHeight + 1) * (gDepth + 1);
+    #else
     int gSize = (gWidth + 1) * (gHeight + 1);
+    #endif
     Log::Info("Number of grid cells: " + std::to_string(gSize));
 
     std::vector<float> zeroFloat(gSize, 0.f);
-    std::vector<glm::vec2> zeroVec(gSize, glm::vec2(0.f));
+    std::vector<Vec> zeroVec(gSize, Vec(0.f));
 
     /* Grid Buffers */
     Log::Info("Grid Buffer allocation");
     allocateSSBO(ssbo_gMass,    7,  zeroFloat.data(), gSize * sizeof(float));
     allocateSSBO(ssbo_gVelX,    8,  zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gVelY,    9, zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gVelCol,  10, zeroVec.data(), gSize * sizeof(glm::vec2));
-    allocateSSBO(ssbo_gVelFric, 11, zeroVec.data(), gSize * sizeof(glm::vec2));
+    allocateSSBO(ssbo_gVelY,    9,  zeroFloat.data(), gSize * sizeof(float));
+
+    #ifdef SIM_3D
+    allocateSSBO(ssbo_gVelZ,    10, zeroFloat.data(), gSize * sizeof(float));
+    allocateSSBO(ssbo_gVelCol,  11, zeroVec.data(), gSize * sizeof(Vec));
+    allocateSSBO(ssbo_gVelFric, 12, zeroVec.data(), gSize * sizeof(Vec));
+    #else
+    allocateSSBO(ssbo_gVelCol,  10, zeroVec.data(), gSize * sizeof(VecGPU));
+    allocateSSBO(ssbo_gVelFric, 11, zeroVec.data(), gSize * sizeof(VecGPU));
+    #endif
+
     CheckGLError("InitBuffers Grid");
 }
 
-void GPUSolver::ReadbackParticles(std::vector<glm::vec2>& outPos, std::vector<glm::vec2>& outVel)
+void GPUSolver::ReadbackParticles(std::vector<Vec>& outPos, std::vector<Vec>& outVel)
 {
     outPos.resize(numParticles);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_pos);
     glGetBufferSubData(
         GL_SHADER_STORAGE_BUFFER, 
         0, 
-        numParticles * sizeof(glm::vec2), 
+        numParticles * sizeof(Vec), 
         outPos.data()
     );
 
@@ -173,7 +217,7 @@ void GPUSolver::ReadbackParticles(std::vector<glm::vec2>& outPos, std::vector<gl
     glGetBufferSubData(
         GL_SHADER_STORAGE_BUFFER, 
         0, 
-        numParticles * sizeof(glm::vec2), 
+        numParticles * sizeof(Vec),
         outVel.data()
     );
 
@@ -187,6 +231,11 @@ void GPUSolver::DispatchParticles(GLuint prog)
     glUniform1i(glGetUniformLocation(prog, "numParticles"), numParticles);
     glUniform1i(glGetUniformLocation(prog, "gWidth"), gWidth);
     glUniform1i(glGetUniformLocation(prog, "gHeight"), gHeight);
+    
+    #ifdef SIM_3D
+    glUniform1i(glGetUniformLocation(prog, "gDepth"), gDepth);
+    #endif
+
     glUniform1f(glGetUniformLocation(prog, "XI"), XI);
     glUniform1f(glGetUniformLocation(prog, "MU"), MU);
     glUniform1f(glGetUniformLocation(prog, "LAMBDA"), LAMBDA);
@@ -205,28 +254,42 @@ void GPUSolver::DispatchGrid(GLuint prog)
     
     glUniform1i(glGetUniformLocation(prog, "gWidth"), gWidth);
     glUniform1i(glGetUniformLocation(prog, "gHeight"), gHeight);
+    
+    #ifdef SIM_3D
+    glUniform1i(glGetUniformLocation(prog, "gDepth"), gDepth);
+    #endif
+
     glUniform1f(glGetUniformLocation(prog, "borderMargin"), (float)BORDER_MARGIN);
     glUniform1f(glGetUniformLocation(prog, "DELTA_TIME"), DELTA_TIME);
     glUniform1f(glGetUniformLocation(prog, "GRAVITY"), GRAVITY);
     glUniform1f(glGetUniformLocation(prog, "FRICTION"), FRICTION);
     
-    int cells  = (gWidth + 1) * (gHeight + 1);
+    #ifdef SIM_3D
+        int cells = (gWidth + 1) * (gHeight + 1) * (gDepth + 1);
+    #else
+        int cells = (gWidth + 1) * (gHeight + 1);
+    #endif
     int groups = (cells + 63) / 64;
-    
     glDispatchCompute(groups, 1, 1);
 }
 
-const std::vector<glm::vec2>& GPUSolver::GetParticlePositions()
+const std::vector<Vec>& GPUSolver::GetParticlePositions()
 {
     glFinish();
     cachedPositions.resize(numParticles);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_pos);
-    glGetBufferSubData(
-        GL_SHADER_STORAGE_BUFFER, 
-        0,               
-        numParticles * sizeof(glm::vec2),
-        cachedPositions.data()
-    );
+    
+    #ifdef SIM_3D
+        std::vector<VecGPU> padded(numParticles);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_pos);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+            numParticles * sizeof(VecGPU), padded.data());
+        for (int i = 0; i < numParticles; i++)
+            cachedPositions[i] = glm::vec3(padded[i]);
+    #else
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_pos);
+        glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0,
+            numParticles * sizeof(VecGPU), cachedPositions.data());
+    #endif
     
     return cachedPositions;
 }

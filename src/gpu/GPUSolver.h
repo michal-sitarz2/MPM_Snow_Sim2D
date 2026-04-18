@@ -13,10 +13,10 @@ public:
     ~GPUSolver();
 
     void Step();
-    const std::vector<glm::vec2>& GetParticlePositions();
+    const std::vector<Vec>& GetParticlePositions();
 
 private:
-    std::vector<glm::vec2> cachedPositions;
+    std::vector<Vec> cachedPositions;
 
     /** Shader Programs **/
     GLuint reset_prog;
@@ -38,17 +38,25 @@ private:
     // Grid SSBOs
     GLuint ssbo_gMass; // 7: grid cell mass
     GLuint ssbo_gVelX, ssbo_gVelY; // 8, 9: grid velocities
-    GLuint ssbo_gVelCol, ssbo_gVelFric; // 10, 11: grid velocity (post collision/friction)
+    
+    #ifdef SIM_3D
+    GLuint ssbo_gVelZ; // 10: grid velocities (3D)
+    #endif
+    
+    GLuint ssbo_gVelCol, ssbo_gVelFric; // CPU: 10, 11 / GPU: 11, 12: grid velocity (post collision/friction)
 
     /** Counts **/
     int numParticles;
     int gWidth, gHeight;
+    
+    #ifdef SIM_3D
+    int gDepth;
+    #endif
 
     /** Helpers **/
     void InitBuffers();
     
-    void ReadbackParticles(std::vector<glm::vec2>& outPos, std::vector<glm::vec2>& outVel);
-    void ReadbackGridMass(std::vector<float>& outMass);
+    void ReadbackParticles(std::vector<Vec>& outPos, std::vector<Vec>& outVel);
 
     void DispatchParticles(GLuint prog);
     void DispatchGrid(GLuint prog);
