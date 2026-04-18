@@ -1,0 +1,221 @@
+[INFO] OpenGL version: 4.6.0 NVIDIA 566.14
+[INFO] GLSL version: 4.60 NVIDIA
+[INFO] Vendor: NVIDIA Corporation
+[INFO] Renderer: NVIDIA GeForce RTX 3060 Laptop GPU/PCIe/SSE2
+[INFO] ================================================================
+[INFO] Initializing Simulation (GPU)
+[INFO] GPU Solver Initialization
+[INFO] Particle Count: 11868
+[INFO] Particle Buffer allocation
+[INFO] No errors at InitBuffers Particles
+[INFO] Number of grid cells: 20301
+[INFO] Grid Buffer allocation
+[INFO] No errors at InitBuffers Grid
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/p2g.glsl
+[INFO] Shader Program Linked
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/grid_update.glsl
+[INFO] Shader Program Linked
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/g2p.glsl
+[INFO] Shader Program Linked
+[INFO] GPU Shader Compiled: C:/Users/micha/snow-sim/src/gpu/shaders/reset.glsl
+[INFO] Shader Program Linked
+[INFO] Frame: 1
+[INFO] Frame: 2
+[INFO] Frame: 3
+[INFO] Frame: 4
+[INFO] Frame: 5
+[INFO] Frame: 6
+[INFO] Frame: 7
+[INFO] Frame: 8
+[INFO] Frame: 9
+[INFO] Frame: 10
+[INFO] Frame: 11
+[INFO] Frame: 12
+[INFO] Frame: 13
+[INFO] Frame: 14
+[INFO] Frame: 15
+[INFO] Frame: 16
+[INFO] Frame: 17
+[INFO] Frame: 18
+[INFO] Frame: 19
+[INFO] Frame: 20
+[INFO] Frame: 21
+[INFO] Frame: 22
+[INFO] Frame: 23
+[INFO] Frame: 24
+[INFO] Frame: 25
+[INFO] Frame: 26
+[INFO] Frame: 27
+[INFO] Frame: 28
+[INFO] Frame: 29
+[INFO] Frame: 30
+[INFO] Frame: 31
+[INFO] Frame: 32
+[INFO] Frame: 33
+[INFO] Frame: 34
+[INFO] Frame: 35
+[INFO] Frame: 36
+[INFO] Frame: 37
+[INFO] Frame: 38
+[INFO] Frame: 39
+[INFO] Frame: 40
+[INFO] Frame: 41
+[INFO] Frame: 42
+[INFO] Frame: 43
+[INFO] Frame: 44
+[INFO] Frame: 45
+[INFO] Frame: 46
+[INFO] Frame: 47
+[INFO] Frame: 48
+[INFO] Frame: 49
+[INFO] Frame: 50
+[INFO] Frame: 51
+[INFO] Frame: 52
+[INFO] Frame: 53
+[INFO] Frame: 54
+[INFO] Frame: 55
+[INFO] Frame: 56
+[INFO] Frame: 57
+[INFO] Frame: 58
+[INFO] Frame: 59
+[INFO] Frame: 60
+[INFO] Frame: 61
+[INFO] Frame: 62
+[INFO] Frame: 63
+[INFO] Frame: 64
+[INFO] Frame: 65
+[INFO] Frame: 66
+[INFO] Frame: 67
+[INFO] Frame: 68
+[INFO] Frame: 69
+[INFO] Frame: 70
+[INFO] Frame: 71
+[INFO] Frame: 72
+[INFO] Frame: 73
+[INFO] Frame: 74
+[INFO] Frame: 75
+[INFO] Frame: 76
+[INFO] Frame: 77
+[INFO] Frame: 78
+[INFO] Frame: 79
+[INFO] Frame: 80
+[INFO] Frame: 81
+[INFO] Frame: 82
+[INFO] Frame: 83
+[INFO] Frame: 84
+[INFO] Frame: 85
+[INFO] Frame: 86
+[INFO] Frame: 87
+[INFO] Frame: 88
+[INFO] Frame: 89
+[INFO] Frame: 90
+[INFO] Frame: 91
+[INFO] Frame: 92
+[INFO] Frame: 93
+[INFO] Frame: 94
+[INFO] Frame: 95
+[INFO] Frame: 96
+[INFO] Frame: 97
+[INFO] Frame: 98
+[INFO] Frame: 99
+[INFO] Frame: 100
+[INFO] Frame: 101
+[INFO] Frame: 102
+[INFO] Frame: 103
+[INFO] Frame: 104
+[INFO] Frame: 105
+[INFO] Frame: 106
+[INFO] Frame: 107
+[INFO] Frame: 108
+[INFO] Frame: 109
+[INFO] Frame: 110
+[INFO] Frame: 111
+[INFO] Frame: 112
+[INFO] Frame: 113
+[INFO] Frame: 114
+[INFO] Frame: 115
+[INFO] Frame: 116
+[INFO] Frame: 117
+[INFO] Frame: 118
+[INFO] Frame: 119
+[INFO] Frame: 120
+[INFO] Frame: 121
+[INFO] Frame: 122
+[INFO] Frame: 123
+[INFO] Frame: 124
+[INFO] Frame: 125
+[INFO] Frame: 126
+[INFO] Frame: 127
+[INFO] Frame: 128
+[INFO] Frame: 129
+[INFO] Frame: 130
+[INFO] Frame: 131
+[INFO] Frame: 132
+[INFO] Frame: 133
+[INFO] Frame: 134
+[INFO] Frame: 135
+[INFO] Frame: 136
+[INFO] Frame: 137
+[INFO] Frame: 138
+[INFO] Frame: 139
+[INFO] Frame: 140
+[INFO] Frame: 141
+[INFO] Frame: 142
+[INFO] Frame: 143
+[INFO] Frame: 144
+[INFO] Frame: 145
+[INFO] Frame: 146
+[INFO] Frame: 147
+[INFO] Frame: 148
+[INFO] Frame: 149
+[INFO] Frame: 150
+[INFO] Frame: 151
+[INFO] Frame: 152
+[INFO] Frame: 153
+[INFO] Frame: 154
+[INFO] Frame: 155
+[INFO] Frame: 156
+[INFO] Frame: 157
+[INFO] Frame: 158
+[INFO] Frame: 159
+[INFO] Frame: 160
+[INFO] Frame: 161
+[INFO] Frame: 162
+[INFO] Frame: 163
+[INFO] Frame: 164
+[INFO] Frame: 165
+[INFO] Frame: 166
+[INFO] Frame: 167
+[INFO] Frame: 168
+[INFO] Frame: 169
+[INFO] Frame: 170
+[INFO] Frame: 171
+[INFO] Frame: 172
+[INFO] Frame: 173
+[INFO] Frame: 174
+[INFO] Frame: 175
+[INFO] Frame: 176
+[INFO] Frame: 177
+[INFO] Frame: 178
+[INFO] Frame: 179
+[INFO] Frame: 180
+[INFO] Frame: 181
+[INFO] Frame: 182
+[INFO] Frame: 183
+[INFO] Frame: 184
+[INFO] Frame: 185
+[INFO] Frame: 186
+[INFO] Frame: 187
+[INFO] Frame: 188
+[INFO] Frame: 189
+[INFO] Frame: 190
+[INFO] Frame: 191
+[INFO] Frame: 192
+[INFO] Frame: 193
+[INFO] Frame: 194
+[INFO] Frame: 195
+[INFO] Frame: 196
+[INFO] Frame: 197
+[INFO] Frame: 198
+[INFO] Frame: 199
+[INFO] Frame: 200

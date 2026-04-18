@@ -19,10 +19,6 @@ GPUSolver::GPUSolver()
     /* Try to Compile Shaders */
     try
     {
-        // Precompute Particle Values
-        GLuint precompute_shader = CompileShader(SHADER_DIR "/precompute.glsl", GL_COMPUTE_SHADER);
-        precompute_prog = LinkProgram(precompute_shader);
-
         // Particles to Grid step
         GLuint p2g_shader = CompileShader(SHADER_DIR "/p2g.glsl", GL_COMPUTE_SHADER);
         p2g_prog = LinkProgram(p2g_shader);
@@ -60,16 +56,11 @@ GPUSolver::~GPUSolver()
     glDeleteProgram(g2p_prog);
     glDeleteProgram(gridUpdate_prog);
     glDeleteProgram(p2g_prog);
-    glDeleteProgram(precompute_prog);
 }
 
 /* MPM Solver Steps */
 void GPUSolver::Step()
 {
-    /* Precompute Particle A_p */
-    DispatchParticles(precompute_prog);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
     /* Particle to Grid (P2G) scatter step */
     DispatchParticles(p2g_prog);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -146,8 +137,7 @@ void GPUSolver::InitBuffers()
     allocateSSBO(ssbo_vol,  3, vol.data(),  numParticles * sizeof(float));
     allocateSSBO(ssbo_Fe,   4, Fe.data(),   numParticles * sizeof(glm::mat2));
     allocateSSBO(ssbo_Fp,   5, Fp.data(),   numParticles * sizeof(glm::mat2));
-    allocateSSBO(ssbo_Ap,   6, Ap.data(),   numParticles * sizeof(glm::mat2));
-    allocateSSBO(ssbo_Bp,   7, Bp.data(),   numParticles * sizeof(glm::mat2));
+    allocateSSBO(ssbo_Bp,   6, Bp.data(),   numParticles * sizeof(glm::mat2));
     CheckGLError("InitBuffers Particles");
 
     /* Grid */
@@ -159,13 +149,11 @@ void GPUSolver::InitBuffers()
 
     /* Grid Buffers */
     Log::Info("Grid Buffer allocation");
-    allocateSSBO(ssbo_gMass,    8,  zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gVelX,    9,  zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gVelY,    10, zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gForceX,  11, zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gForceY,  12, zeroFloat.data(), gSize * sizeof(float));
-    allocateSSBO(ssbo_gVelCol,  13, zeroVec.data(), gSize * sizeof(glm::vec2));
-    allocateSSBO(ssbo_gVelFric, 14, zeroVec.data(), gSize * sizeof(glm::vec2));
+    allocateSSBO(ssbo_gMass,    7,  zeroFloat.data(), gSize * sizeof(float));
+    allocateSSBO(ssbo_gVelX,    8,  zeroFloat.data(), gSize * sizeof(float));
+    allocateSSBO(ssbo_gVelY,    9, zeroFloat.data(), gSize * sizeof(float));
+    allocateSSBO(ssbo_gVelCol,  10, zeroVec.data(), gSize * sizeof(glm::vec2));
+    allocateSSBO(ssbo_gVelFric, 11, zeroVec.data(), gSize * sizeof(glm::vec2));
     CheckGLError("InitBuffers Grid");
 }
 

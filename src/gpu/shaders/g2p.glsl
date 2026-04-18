@@ -6,10 +6,10 @@ layout(std430, binding = 0) coherent buffer Pos { vec2 pos[]; };
 layout(std430, binding = 1) coherent buffer Vel { vec2 vel[]; };
 layout(std430, binding = 4) coherent buffer Fe { mat2 fe[]; };
 layout(std430, binding = 5) coherent buffer Fp { mat2 fp[]; };
-layout(std430, binding = 7) coherent buffer Bp { mat2 bp[]; };
+layout(std430, binding = 6) coherent buffer Bp { mat2 bp[]; };
 
-layout(std430, binding = 13) readonly buffer GVelCol { vec2 gVelCol[]; };
-layout(std430, binding = 14) readonly buffer GVelFric { vec2 gVelFric[]; };
+layout(std430, binding = 10) readonly buffer GVelCol { vec2 gVelCol[]; };
+layout(std430, binding = 11) readonly buffer GVelFric { vec2 gVelFric[]; };
 
 uniform int numParticles;
 uniform int gWidth;
@@ -33,7 +33,6 @@ void main()
     vec2 new_vel = vec2(0.0);
     mat2 new_Bp = mat2(0.0);
     vec2 new_pos = vec2(0.0);
-    mat2 gradVel = mat2(0.0);
 
     for (int i = gx - 1; i <= gx + 2; i++)
     {
@@ -62,17 +61,8 @@ void main()
                 vFric.x * (-dist.y), vFric.y * (-dist.y)
             );
 
-            // Weight Gradient
-            vec2  dWeight = computeGradWeight(dist);
-            
             // Update position
             new_pos += (DELTA_TIME * vCol + gi) * weight;
-
-            // Grad velocity
-            gradVel += mat2(
-                vCol.x * dWeight.x, vCol.y * dWeight.x,
-                vCol.x * dWeight.y, vCol.y * dWeight.y
-            );
         }
     }
 
@@ -80,11 +70,11 @@ void main()
     bp[pid] = new_Bp;
     pos[pid] = new_pos;
 
-    /* Update Deformation Gradient */
-    // Temporary definitions
-    mat2 FE_hat = (mat2(1.0) + DELTA_TIME * gradVel) * fe[pid];
+    /* Update Deformation Gradient using APIC Bp */
+    mat2 C = 3.0 * new_Bp;
+    mat2 FE_hat = (mat2(1.0) + DELTA_TIME * C) * fe[pid];
     mat2 FP_hat = fp[pid];
-
+    
     // SVD of Elastic Force
     mat2 U; vec2 Sigma; mat2 V;
     svd(FE_hat, U, Sigma, V);

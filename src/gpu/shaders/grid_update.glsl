@@ -1,13 +1,11 @@
 #version 430
 layout(local_size_x = 64) in;
 
-layout(std430, binding = 8) coherent buffer GMass { float gMass[]; };
-layout(std430, binding = 9) coherent buffer GVelX { float gVelX[]; };
-layout(std430, binding = 10) coherent buffer GVelY { float gVelY[]; };
-layout(std430, binding = 11) coherent buffer GForceX { float gForceX[]; };
-layout(std430, binding = 12) coherent buffer GForceY { float gForceY[]; };
-layout(std430, binding = 13) coherent buffer GVelCol { vec2  gVelCol[]; };
-layout(std430, binding = 14) coherent buffer GVelFric { vec2  gVelFric[]; };
+layout(std430, binding = 7) coherent buffer GMass { float gMass[]; };
+layout(std430, binding = 8) coherent buffer GVelX { float gVelX[]; };
+layout(std430, binding = 9) coherent buffer GVelY { float gVelY[]; };
+layout(std430, binding = 10) coherent buffer GVelCol { vec2  gVelCol[]; };
+layout(std430, binding = 11) coherent buffer GVelFric { vec2  gVelFric[]; };
 
 uniform int gWidth;
 uniform int gHeight;
@@ -94,10 +92,8 @@ void main()
     // Normalize the velocities
     vec2 vel = vec2(gVelX[id], gVelY[id]) / mass;
 
-    // Update forces
-    vec2 old_force = vec2(gForceX[id], gForceY[id]);
-    vec2 new_force = (vec2(0.0, GRAVITY) + (-old_force / mass)) * DELTA_TIME;
-    vel += new_force;
+    // Gravity
+    vel += vec2(0.0, GRAVITY) * DELTA_TIME;
 
     /* Cell location 2D */
     int  x = int(id) % (gWidth + 1);

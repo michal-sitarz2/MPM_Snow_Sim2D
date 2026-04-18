@@ -20,7 +20,6 @@ private:
 
     /** Shader Programs **/
     GLuint reset_prog;
-    GLuint precompute_prog;
     GLuint p2g_prog;
     GLuint gridUpdate_prog;
     GLuint g2p_prog;
@@ -34,14 +33,12 @@ private:
 
     GLuint ssbo_Fe; // 4: elastic deformation gradient (Fe)
     GLuint ssbo_Fp; // 5: plastic deformation gradient (Fp)
-    GLuint ssbo_Ap; // 6: force matrix (Ap)
-    GLuint ssbo_Bp; // 7: velocity field (Bp)
+    GLuint ssbo_Bp; // 6: velocity field (Bp)
 
     // Grid SSBOs
-    GLuint ssbo_gMass; // 8: grid cell mass
-    GLuint ssbo_gVelX, ssbo_gVelY; // 9, 10: grid velocities
-    GLuint ssbo_gForceX, ssbo_gForceY; // 11, 12: grid forces
-    GLuint ssbo_gVelCol, ssbo_gVelFric; // 13, 14: grid velocity (post collision/friction)
+    GLuint ssbo_gMass; // 7: grid cell mass
+    GLuint ssbo_gVelX, ssbo_gVelY; // 8, 9: grid velocities
+    GLuint ssbo_gVelCol, ssbo_gVelFric; // 10, 11: grid velocity (post collision/friction)
 
     /** Counts **/
     int numParticles;
